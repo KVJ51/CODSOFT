@@ -12,7 +12,7 @@ def chatbot_response(user_input):
     elif re.search(r'\b(bye|goodbye|see you)\b', user_input):
         return "Goodbye! Have a great day!"
     elif "thank you" in user_input or "thanks" in user_input:
-        return "You're welcome! 😊"
+        return "You're welcome! "
     else:
         return "I'm sorry, I don't understand that yet."
 

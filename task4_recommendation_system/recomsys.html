@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skincare Recommendation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(252, 83, 168, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
+            text-shadow: 10px 10px 4px rgba(244, 11, 127, 0.3);
+        }
+
+        .user-profile {
+            background: linear-gradient(135deg, #ffeef8 0%, #fdf2f8 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #ec4899;
+        }
+
+        .preference-section {
+            margin-bottom: 20px;
+        }
+
+        .preference-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .preference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .preference-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .preference-item:hover {
+            border-color: #ec4899;
+            transform: translateY(-2px);
+        }
+
+        .preference-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .preference-item input[type="range"] {
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ec4899, #f472b6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .recommendations {
+            margin-top: 30px;
+        }
+
+        .recommendation-methods {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .method-tab {
+            padding: 10px 20px;
+            border: 2px solid #ec4899;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .method-tab.active {
+            background: #ec4899;
+            color: white;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.1);
+            border-left: 5px solid #ec4899;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .match-score {
+            background: linear-gradient(45deg, #ec4899, #f472b6);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .product-details {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .recommendation-reason {
+            background: #fdf2f8;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.9em;
+            color: #666;
+            border-left: 3px solid #ec4899;
+        }
+
+        .rating-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 1.2em;
+        }
+
+        .no-recommendations {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+            padding: 40px;
+            background: #fdf2f8;
+            border-radius: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .preference-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .recommendation-methods {
+                flex-direction: column;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Skincare Recommendation System</h1>
+        
+        <div class="user-profile">
+            <div class="preference-section">
+                <h3>Skin Type</h3>
+                <div class="preference-grid">
+                    <div class="preference-item">
+                        <input type="checkbox" id="oily" value="oily">
+                        <label for="oily">Oily</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="dry" value="dry">
+                        <label for="dry">Dry</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="combination" value="combination">
+                        <label for="combination">Combination</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="sensitive" value="sensitive">
+                        <label for="sensitive">Sensitive</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preference-section">
+                <h3>Skin Concerns</h3>
+                <div class="preference-grid">
+                    <div class="preference-item">
+                        <input type="checkbox" id="acne" value="acne">
+                        <label for="acne">Acne</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="aging" value="aging">
+                        <label for="aging">Anti-aging</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="pigmentation" value="pigmentation">
+                        <label for="pigmentation">Pigmentation</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="hydration" value="hydration">
+                        <label for="hydration">Hydration</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="pores" value="pores">
+                        <label for="pores">Large Pores</label>
+                    </div>
+                    <div class="preference-item">
+                        <input type="checkbox" id="redness" value="redness">
+                        <label for="redness">Redness</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preference-section">
+                <h3>Budget Range</h3>
+                <div class="preference-item">
+                    <label for="budget">₹</label>
+                    <input type="range" id="budget" min="1000" max="15000" value="4000">
+                    <span id="budgetValue">₹4000</span>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" onclick="generateRecommendations()">Get Recommendations</button>
+                <button class="btn btn-secondary" onclick="clearPreferences()">Clear All</button>
+            </div>
+        </div>
+
+        <div class="recommendations" id="recommendations" style="display: none;">
+            <h2>Your Personalized Recommendations</h2>
+            
+            <div class="recommendation-methods">
+                <div class="method-tab active" onclick="switchMethod('collaborative')">
+                    Collaborative Filtering
+                </div>
+                <div class="method-tab" onclick="switchMethod('content')">
+                    Content-Based
+                </div>
+                <div class="method-tab" onclick="switchMethod('hybrid')">
+                    Hybrid
+                </div>
+            </div>
+
+            <div id="recommendationResults">
+                <!-- Recommendations will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample product database
+        const products = [
+            {
+                id: 1,
+                name: "Hydrating Cleanser",
+                type: "cleanser",
+                price: 2100,
+                skinTypes: ["dry", "sensitive"],
+                concerns: ["hydration", "redness"],
+                ingredients: ["hyaluronic acid", "ceramides", "niacinamide"],
+                rating: 4.5,
+                reviews: 1250,
+                description: "Gentle hydrating cleanser with hyaluronic acid",
+                image: "https://images.deepai.org/art-image/4f97ab52eec647b0bd4a2481826fb026/hydrating-cleanser.jpg"
+            },
+            {
+                id: 2,
+                name: "Salicylic Acid Serum",
+                type: "serum",
+                price: 2950,
+                skinTypes: ["oily", "combination"],
+                concerns: ["acne", "pores"],
+                ingredients: ["salicylic acid", "zinc", "tea tree"],
+                rating: 4.3,
+                reviews: 890,
+                description: "BHA serum for acne-prone skin",
+                image: "https://m.media-amazon.com/images/I/51YDAPq1JSL._UF1000,1000_QL80_.jpg"
+            },
+            {
+                id: 3,
+                name: "Vitamin C Brightening Serum",
+                type: "serum",
+                price: 3800,
+                skinTypes: ["all"],
+                concerns: ["pigmentation", "aging"],
+                ingredients: ["vitamin c", "vitamin e", "ferulic acid"],
+                rating: 4.7,
+                reviews: 2100,
+                description: "Antioxidant serum for brightening and anti-aging",
+                image: "https://api.deepai.org/job-view-file/fd2b2feb-3eb0-4539-bee9-4ca1b294921e/outputs/output.jpg"
+            },
+            {
+                id: 4,
+                name: "Retinol Night Cream",
+                type: "moisturizer",
+                price: 4650,
+                skinTypes: ["normal", "combination"],
+                concerns: ["aging", "pigmentation"],
+                ingredients: ["retinol", "peptides", "squalane"],
+                rating: 4.4,
+                reviews: 750,
+                description: "Anti-aging night cream with retinol",
+                image: "https://api.deepai.org/job-view-file/caac6d76-687c-4812-acc6-ddb811553a64/outputs/output.jpg"
+            },
+            {
+                id: 5,
+                name: "Gentle Exfoliating Toner",
+                type: "toner",
+                price: 2550,
+                skinTypes: ["sensitive", "dry"],
+                concerns: ["hydration", "redness"],
+                ingredients: ["lactic acid", "aloe vera", "chamomile"],
+                rating: 4.2,
+                reviews: 680,
+                description: "Mild exfoliating toner for sensitive skin",
+                image: "https://aulilifestyle.com/cdn/shop/files/1stimage_47b73c60-5f92-4071-80e0-7ffda18b23fc.jpg?v=1734690897"
+            },
+            {
+                id: 6,
+                name: "Niacinamide Pore Minimizer",
+                type: "serum",
+                price: 2400,
+                skinTypes: ["oily", "combination"],
+                concerns: ["pores", "acne"],
+                ingredients: ["niacinamide", "zinc", "hyaluronic acid"],
+                rating: 4.6,
+                reviews: 1500,
+                description: "Pore-minimizing serum with niacinamide",
+                image: "https://m.media-amazon.com/images/I/51VXqhyHAML._UF1000,1000_QL80_.jpg"
+            },
+            {
+                id: 7,
+                name: "Hydrating Face Mask",
+                type: "mask",
+                price: 1850,
+                skinTypes: ["dry", "sensitive"],
+                concerns: ["hydration", "redness"],
+                ingredients: ["hyaluronic acid", "aloe vera", "collagen"],
+                rating: 4.3,
+                reviews: 920,
+                description: "Intensive hydrating sheet mask",
+                image: "https://images-cdn.ubuy.co.in/633b606f7f6bfc15ce1d61f7-sheet-mask-aloe-vera-face-mask-skincare.jpg"
+            },
+            {
+                id: 8,
+                name: "Clay Purifying Mask",
+                type: "mask",
+                price: 2200,
+                skinTypes: ["oily", "combination"],
+                concerns: ["acne", "pores"],
+                ingredients: ["kaolin clay", "charcoal", "tea tree"],
+                rating: 4.1,
+                reviews: 540,
+                description: "Deep cleansing clay mask for oily skin",
+                image: "https://api.deepai.org/job-view-file/8e2a6a4d-b27d-4e01-816d-01ea48fb7534/outputs/output.jpg"
+            }
+        ];
+
+        // Sample user-product interaction data for collaborative filtering
+        const userInteractions = {
+            user1: {purchases: [1, 3, 5], ratings: {1: 5, 3: 4, 5: 4}},
+            user2: {purchases: [2, 6, 8], ratings: {2: 4, 6: 5, 8: 4}},
+            user3: {purchases: [1, 4, 7], ratings: {1: 4, 4: 5, 7: 4}},
+            user4: {purchases: [2, 3, 6], ratings: {2: 5, 3: 4, 6: 4}},
+            user5: {purchases: [4, 5, 7], ratings: {4: 4, 5: 5, 7: 4}}
+        };
+
+        let currentMethod = 'collaborative';
+        let userPreferences = {};
+
+        // Update budget display
+        document.getElementById('budget').addEventListener('input', function() {
+            document.getElementById('budgetValue').textContent = '₹' + this.value;
+        });
+
+        function getUserPreferences() {
+            const skinTypes = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value)
+                .filter(value => ['oily', 'dry', 'combination', 'sensitive'].includes(value));
+            
+            const concerns = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value)
+                .filter(value => ['acne', 'aging', 'pigmentation', 'hydration', 'pores', 'redness'].includes(value));
+            
+            const budget = parseInt(document.getElementById('budget').value);
+
+            return {
+                skinTypes,
+                concerns,
+                budget
+            };
+        }
+
+        function contentBasedRecommendation(preferences) {
+            const recommendations = products.map(product => {
+                let score = 0;
+                
+                // Check skin type compatibility
+                const skinTypeMatch = preferences.skinTypes.some(type => 
+                    product.skinTypes.includes(type) || product.skinTypes.includes('all')
+                );
+                if (skinTypeMatch) score += 30;
+                
+                // Check concern compatibility
+                const concernMatches = preferences.concerns.filter(concern => 
+                    product.concerns.includes(concern)
+                ).length;
+                score += concernMatches * 25;
+                
+                // Budget consideration
+                if (product.price <= preferences.budget) {
+                    score += 20;
+                } else {
+                    score -= (product.price - preferences.budget) * 0.5;
+                }
+                
+                // Rating boost
+                score += product.rating * 5;
+                
+                return {
+                    ...product,
+                    score: Math.max(0, score),
+                    reason: `Matches ${concernMatches} of your concerns, suitable for your skin type, and fits your budget.`
+                };
+            });
+
+            return recommendations.sort((a, b) => b.score - a.score).slice(0, 6);
+        }
+
+        function collaborativeFiltering(preferences) {
+            // Find similar users based on preferences
+            const currentUserVector = createUserVector(preferences);
+            const similarities = {};
+            
+            Object.keys(userInteractions).forEach(userId => {
+                const userVector = createUserVectorFromInteractions(userInteractions[userId]);
+                similarities[userId] = cosineSimilarity(currentUserVector, userVector);
+            });
+            
+            // Get recommendations from similar users
+            const recommendations = {};
+            Object.keys(similarities).forEach(userId => {
+                const similarity = similarities[userId];
+                if (similarity > 0.1) {
+                    userInteractions[userId].purchases.forEach(productId => {
+                        const product = products.find(p => p.id === productId);
+                        if (product && product.price <= preferences.budget) {
+                            if (!recommendations[productId]) {
+                                recommendations[productId] = {
+                                    ...product,
+                                    score: 0,
+                                    reason: `Recommended by users with similar preferences`
+                                };
+                            }
+                            recommendations[productId].score += similarity * 100;
+                        }
+                    });
+                }
+            });
+            
+            return Object.values(recommendations)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 6);
+        }
+
+        function hybridRecommendation(preferences) {
+            const contentRecs = contentBasedRecommendation(preferences);
+            const collabRecs = collaborativeFiltering(preferences);
+            
+            // Combine recommendations with weighted scores
+            const combined = {};
+            
+            contentRecs.forEach(rec => {
+                combined[rec.id] = {
+                    ...rec,
+                    score: rec.score * 0.6, // 60% weight for content-based
+                    reason: `Content-based: ${rec.reason}`
+                };
+            });
+            
+            collabRecs.forEach(rec => {
+                if (combined[rec.id]) {
+                    combined[rec.id].score += rec.score * 0.4; // 40% weight for collaborative
+                    combined[rec.id].reason += ` | Collaborative: ${rec.reason}`;
+                } else {
+                    combined[rec.id] = {
+                        ...rec,
+                        score: rec.score * 0.4,
+                        reason: `Collaborative: ${rec.reason}`
+                    };
+                }
+            });
+            
+            return Object.values(combined)
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 6);
+        }
+
+        function createUserVector(preferences) {
+            // Create a simple vector representation of user preferences
+            const vector = {};
+            preferences.skinTypes.forEach(type => vector[type] = 1);
+            preferences.concerns.forEach(concern => vector[concern] = 1);
+            return vector;
+        }
+
+        function createUserVectorFromInteractions(interactions) {
+            const vector = {};
+            interactions.purchases.forEach(productId => {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    product.skinTypes.forEach(type => vector[type] = (vector[type] || 0) + 1);
+                    product.concerns.forEach(concern => vector[concern] = (vector[concern] || 0) + 1);
+                }
+            });
+            return vector;
+        }
+
+        function cosineSimilarity(vec1, vec2) {
+            const keys1 = Object.keys(vec1);
+            const keys2 = Object.keys(vec2);
+            const allKeys = [...new Set([...keys1, ...keys2])];
+            
+            let dotProduct = 0;
+            let norm1 = 0;
+            let norm2 = 0;
+            
+            allKeys.forEach(key => {
+                const val1 = vec1[key] || 0;
+                const val2 = vec2[key] || 0;
+                dotProduct += val1 * val2;
+                norm1 += val1 * val1;
+                norm2 += val2 * val2;
+            });
+            
+            if (norm1 === 0 || norm2 === 0) return 0;
+            return dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2));
+        }
+
+        function generateRecommendations() {
+            userPreferences = getUserPreferences();
+            
+            if (userPreferences.skinTypes.length === 0 && userPreferences.concerns.length === 0) {
+                alert('Please select at least one skin type or concern to get recommendations.');
+                return;
+            }
+
+            document.getElementById('recommendations').style.display = 'block';
+            displayRecommendations();
+        }
+
+        function displayRecommendations() {
+            document.getElementById('recommendationResults').innerHTML = '';
+            if (!userPreferences || Object.keys(userPreferences).length === 0) {
+                document.getElementById('recommendationResults').innerHTML = '<div class="no-recommendations">Please select your preferences to see recommendations.</div>';
+                return;
+            }
+            // Clear previous results
+            
+
+            let recommendations;
+            
+            switch(currentMethod) {
+                case 'collaborative':
+                    recommendations = collaborativeFiltering(userPreferences);
+                    break;
+                case 'content':
+                    recommendations = contentBasedRecommendation(userPreferences);
+                    break;
+                case 'hybrid':
+                    recommendations = hybridRecommendation(userPreferences);
+                    break;
+            }
+
+            const resultsDiv = document.getElementById('recommendationResults');
+            
+            if (recommendations.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-recommendations">No recommendations found. Try adjusting your preferences.</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = recommendations.map(product => `
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-name">${product.name}</div>
+                        <div class="match-score">${Math.round(product.score)}% Match</div>
+                    </div>
+                    <img src="${product.image}" alt="${product.name}" style="width: 100%; height: auto; border-radius: 3px; margin-bottom: 3px;">
+                    <div class="product-details">
+                        <div class="rating-section">
+                            <div class="stars">${'★'.repeat(Math.floor(product.rating))}${'☆'.repeat(5-Math.floor(product.rating))}</div>
+                            <span>${product.rating} (${product.reviews} reviews)</span>
+                        </div>
+                        <p><strong>Price:</strong> ₹${product.price}</p>
+                        <p><strong>Type:</strong> ${product.type}</p>
+                        <p>${product.description}</p>
+                    </div>
+                    <div class="product-tags">
+                        ${product.ingredients.map(ingredient => `<span class="tag">${ingredient}</span>`).join('')}
+                    </div>
+                    <div class="recommendation-reason">
+                        <strong>Why recommended:</strong> ${product.reason}
+                    </div>
+                </div>
+            `).join('');
+            resultsDiv.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    alert(`You selected: ${card.querySelector('.product-name').textContent}`);
+                });
+            });
+            resultsDiv.style.display = 'grid';
+            resultsDiv.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px,1fr))';
+            resultsDiv.style.gap = '20px';
+            resultsDiv.style.marginTop = '20px';
+            resultsDiv.style.padding = '20px';
+            resultsDiv.style.background = 'rgba(255, 255, 255, 0.95)';
+            resultsDiv.style.borderRadius = '15px';
+            resultsDiv.style.boxShadow = '0 5px 15px rgba(236, 72, 153, 0.1)';
+            resultsDiv.style.borderLeft = '5px solid #ec4899';
+            resultsDiv.style.display = 'grid';
+            resultsDiv.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px,1fr))';
+            resultsDiv.style.gap = '20px';
+        }
+
+        function switchMethod(method) {
+            currentMethod = method;
+            
+            // Update active tab
+            document.querySelectorAll('.method-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Regenerate recommendations if preferences exist
+            if (Object.keys(userPreferences).length > 0) {
+                displayRecommendations();
+            }
+        }
+
+        function clearPreferences() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('budget').value = 4000;
+            document.getElementById('budgetValue').textContent = '₹4000';
+            document.getElementById('recommendations').style.display = 'none';
+            userPreferences = {};
+        }
+    </script>
+</body>
+</html>
